@@ -3,6 +3,9 @@
 #include "User.h"
 #include <iostream>
 #include <vector>
+#include <limits>
+
+//using namespace std;
 
 int User::static_number_ = 0;  // инициализируем статическое поле в классе User для создания userID
 const int toALL = 1;  // когда надо отправить всем, пишем адрес назначения toALL
@@ -30,7 +33,7 @@ const int tModerator = 2;  // адрес модератора
 //	return 0;  // возвращает 0, если вход неуспешен
 //}
 
-const User* enterInChat(std::vector<User*>& v)
+ User* enterInChat(std::vector<User*>& v)
 {
 	std::string login;
 	std::string password;
@@ -46,7 +49,7 @@ const User* enterInChat(std::vector<User*>& v)
 		{
 			user->setActivNow();
 			std::cout << "Здравствуйте " << user->getLogin() << ", Вы вошли в чат!" << std::endl;
-			return user; // возвращает ID пользователя, если вход успешен
+			return user; // возвращает указатель на пользователя, если вход успешен
 		}
 	}
 	return nullptr;  // возвращает 0, если вход неуспешен
@@ -72,18 +75,21 @@ int searchIDbyLogin(std::vector<User*>& vpU, const std::string& login)
 	return 0;
 }
 
-//const Message* createMsg(std::vector<User*>& vpU, const User* user)
-//{
-//
-//	std::string text;
-//	std::cout << "Введите сообщение: ";
-//	std::cin >> text;
-//	std::string login;
-//	std::cout << "Введите логин получателя сообщения: ";
-//	std::cin >> login;
-//
-//	return &Message(text, searchIDbyLogin(vpU, login), user->getID());
-//}
+void writeMessage(std::vector<User*>& vpU, const User* user, std::vector<Message*>& vpMs)
+{
+	std::string text;
+	std::cout << "Введите сообщение: ";
+	std::cin >> text;
+	std::string login;
+	std::cin.clear();
+	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+	std::cout << "Введите логин получателя сообщения: ";
+
+	std::cin >> login;
+	int id = searchIDbyLogin(vpU, login);
+	Message ms = Message(text, id, user->getID());
+	 vpMs.emplace_back(&ms);
+}
 
 
 
@@ -115,24 +121,39 @@ int main()
 	while (work)
 	{
 
-		const User* entered = enterInChat(vpUsers);
+		User* entered = enterInChat(vpUsers);
 		if (entered)
 		{
 			for (const auto& msg : vpMsg)
 			{
-				if (msg->getTo() == toALL)
+				int it_to = msg->getTo();
+				if (it_to == toALL)
 				{
 					std::cout << "Сообщение для всех: " << msg;
-					/*int choice;
+					int choice;
 					std::cout << "Выберете: 1 - ответить, 2 - написать другому пользователю, 3 - выйти из чата.";
 					std::cin >> choice;
 
 					switch (choice)
-						case 1:*/
+					{
+					case 1:
 
+					case 2:
+					{
+						writeMessage(vpUsers, entered, vpMsg);
+					}
+					break;
+					
+					case 3:
+						entered->setDeactivNow();
+						break;
+
+					default:
+						std::cout << "defaullt choise";
+					}
 
 				}
-				if (msg->getTo() == entered->getID())
+				if (it_to == entered->getID())
 				{
 					std::cout << "Сообщение от: " << searchUserByID(vpUsers, msg->getFrom())->getLogin()
 						<< ": " << msg;
