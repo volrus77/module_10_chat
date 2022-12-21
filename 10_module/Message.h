@@ -16,6 +16,9 @@ public:
 	int getTo() { return to_; }
 	int getFrom() { return from_; }
 
+	// перегруженый оператор= ( оператор присваивания копированием)
+
+
 	// перегруженный оператор<<
 	friend std::ostream& operator<<(std::ostream& out, const Message* msg);
 
