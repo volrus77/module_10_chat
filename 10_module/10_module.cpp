@@ -9,6 +9,25 @@ int User::static_number_ = 0;  // инициализируем статичес�
 const int toALL = 1;  // когда надо отправить всем, пишем адрес назначения toALL
 const int tModerator = 2;  // адрес модератора
 
+
+bool registration(std::vector<User*>& v)
+{
+	std::string login;
+	std::string password;
+	std::cout << "Для регистрации введите логин: ";
+	std::cin >> login;
+	std::cout << "Введите пароль: ";
+	std::cin >> password;
+	std::cout << "Введите имя: ";
+	std::string name;
+	std::cin >> name;
+
+	User* us = new User(login, password, name);
+	v.push_back(us);
+	std::cout << login << " Вы зарегистрированы." << std::endl;
+	return true;
+}
+
  User* enterInChat(std::vector<User*>& v)
 {
 	std::string login;
@@ -65,8 +84,8 @@ void writeMessage(std::vector<User*>& vpU, std::vector<Message*>& vpMs, int id_f
 	std::string text;
 	std::getline(std::cin, text);
 	
-	Message ms = Message(text, searchIDbyLogin(vpU, login), id_from );
-	vpMs.push_back(&ms);
+	Message* ms =  new Message(text, searchIDbyLogin(vpU, login), id_from );
+	vpMs.push_back(ms);
 }
 
 void writeMessage(std::vector<User*>& vpU, std::vector<Message*>& vpMs, int id_to, int id_from)
@@ -78,8 +97,8 @@ void writeMessage(std::vector<User*>& vpU, std::vector<Message*>& vpMs, int id_t
 	std::string text;
 	std::getline(std::cin, text);
 
-	Message ms = Message(text, id_to, id_from);
-	vpMs.push_back(&ms);
+	Message* ms =  new Message(text, id_to, id_from);
+	vpMs.push_back(ms);
 }
 
 
@@ -89,16 +108,19 @@ int main()
 
 	User all("loginall", "passwordall", "Nameall"); // Первым создаём пользователя all, его ID = 1
 	User moderator("loginm", "passwordm", "Namem"); // Затем создаём модератора, его ID = 2
-	User user1("login1", "password1", "Name1");
-	User user2("login2", "password2", "Name2");
-	User user3("login3", "password3", "Name3");
+	//User user1("login1", "password1", "Name1");
+	//User user2("login2", "password2", "Name2");
+	//User user3("login3", "password3", "Name3");
 
-	std::vector<User*> vpUsers{ &all, &moderator, &user1, &user2, &user3 };
+	std::vector<User*> vpUsers{ &all, &moderator };
 
-	Message msg1("Привет, не виделись сто лет.", user2.getID(), user1.getID());
-	Message msg2("Хорошая погода!", user3.getID(), user2.getID());
-	Message msg3("How are you?", user1.getID(), user3.getID());
-	Message msg4("Всем, всем, всем!!! Общий привет!!!", toALL, user2.getID());
+	registration(vpUsers);
+	registration(vpUsers);
+
+	//Message msg1("Привет, не виделись сто лет.", user2.getID(), user1.getID());
+	//Message msg2("Хорошая погода!", user3.getID(), user2.getID());
+	//Message msg3("How are you?", user1.getID(), user3.getID());
+	//Message msg4("Всем, всем, всем!!! Общий привет!!!", toALL, user2.getID());
 
 	//std::vector<Message*> vpMsg{ &msg1, &msg2, &msg3, &msg4 };
 	std::vector<Message*> vpMsg{ };
@@ -119,7 +141,8 @@ int main()
 					std::cout << "Сообщение от: " << searchUserByID(vpUsers, msg->getFrom())->getLogin()
 						<< ": " << msg;
 					int choice;
-					std::cout << "Выберете: 1 - ответить, 2 - написать другому пользователю, 3 - выйти из чата.";
+					std::cout << "Выберете: 1 - ответить, 2 - написать другому пользователю, 3 - выйти из чата."
+						<< "4 - выйти из программы.";
 					std::cin >> choice;
 
 					if (choice == 1)
@@ -145,6 +168,13 @@ int main()
 						processed = true;
 						break;
 					}
+					if (choice == 4)
+					{
+						entered->setDeactivNow();
+						processed = true;
+						work = false;
+						break;
+					}
 				}
 			}
 			if (!processed)
@@ -162,7 +192,7 @@ int main()
 
 	}
 
-
+	std::cout << "Выход из программы.";
 	return 0;
 }
 
