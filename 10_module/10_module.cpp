@@ -1,4 +1,4 @@
-﻿// 10-chat_from_classes_usser_message.cpp : пробуем использовать умные указатели
+﻿// 10-chat_from_classes_usser_message.cpp :
 #include "Message.h"
 #include "User.h"
 #include <iostream>
@@ -9,7 +9,7 @@ int User::static_number_ = 0;  // инициализируем статичес�
 const int toALL = 1;  // когда надо отправить всем, пишем адрес назначения toALL
 const int tModerator = 2;  // адрес модератора
 
-
+// функция регистрации пользователя, пользователь сохраняется в векторе
 bool registration(std::vector<User*>& v)
 {
 	std::string login;
@@ -28,6 +28,7 @@ bool registration(std::vector<User*>& v)
 	return true;
 }
 
+// функция входа в чат
  User* enterInChat(std::vector<User*>& v)
 {
 	std::string login;
@@ -69,6 +70,7 @@ int searchIDbyLogin(std::vector<User*>& vpU, const std::string& login)
 	return 0;
 }
 
+// пишем сообщение, логин получателя запрашиваем с клавиатуры
 void writeMessage(std::vector<User*>& vpU, std::vector<Message*>& vpMs, int id_from)
 {
 	std::cin.clear();
@@ -83,10 +85,11 @@ void writeMessage(std::vector<User*>& vpU, std::vector<Message*>& vpMs, int id_f
 	std::string text;
 	std::getline(std::cin, text);
 	
-	Message* ms =  new Message(text, searchIDbyLogin(vpU, login), id_from );
+	Message* ms =  new Message(text, searchIDbyLogin(vpU, login), id_from ); // использую new без delete
 	vpMs.push_back(ms);
 }
 
+// пишем сообщение как ответ, т. е. когда известен получатель
 void writeMessage(std::vector<User*>& vpU, std::vector<Message*>& vpMs, int id_to, int id_from)
 {
 	std::cin.clear();
@@ -96,7 +99,7 @@ void writeMessage(std::vector<User*>& vpU, std::vector<Message*>& vpMs, int id_t
 	std::string text;
 	std::getline(std::cin, text);
 
-	Message* ms =  new Message(text, id_to, id_from);
+	Message* ms =  new Message(text, id_to, id_from);  // использую new без delete
 	vpMs.push_back(ms);
 }
 
@@ -107,25 +110,16 @@ int main()
 
 	User all("loginall", "passwordall", "Nameall"); // Первым создаём пользователя all, его ID = 1
 	User moderator("loginm", "passwordm", "Namem"); // Затем создаём модератора, его ID = 2
-	//User user1("login1", "password1", "Name1");
-	//User user2("login2", "password2", "Name2");
-	//User user3("login3", "password3", "Name3");
 
-	std::vector<User*> vpUsers{ &all, &moderator };
+	std::vector<User*> vpUsers{ &all, &moderator };   // создаём вектор для пользователей
 
-	registration(vpUsers);
+	registration(vpUsers);  // регистрируем двух плользователей
 	registration(vpUsers);
 
-	//Message msg1("Привет, не виделись сто лет.", user2.getID(), user1.getID());
-	//Message msg2("Хорошая погода!", user3.getID(), user2.getID());
-	//Message msg3("How are you?", user1.getID(), user3.getID());
-	//Message msg4("Всем, всем, всем!!! Общий привет!!!", toALL, user2.getID());
-
-	//std::vector<Message*> vpMsg{ &msg1, &msg2, &msg3, &msg4 };
-	std::vector<Message*> vpMsg{ };
+	std::vector<Message*> vpMsg{ };  // создаём вектор для сообщений
 
 	bool work = true;
-	while (work)
+	while (work)   //  основной цикл чата
 	{
 
 		User* entered = enterInChat(vpUsers);
