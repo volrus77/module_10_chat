@@ -1,4 +1,4 @@
-﻿// 10-chat_from_classes_usser_message.cpp : 
+﻿// 10-chat_from_classes_usser_message.cpp : пробуем использовать умные указатели
 #include "Message.h"
 #include "User.h"
 #include <iostream>
@@ -50,14 +50,13 @@ bool registration(std::vector<User*>& v)
 	return nullptr;  // возвращает 0, если вход неуспешен
 }
 
-const User* searchUserByID(std::vector<User*>& vpU, int id)
+const std::string& searchLoginByID(std::vector<User*>& vpU, int id)
 {
 	for (const auto pUser : vpU)
 	{
 		if (pUser->getID() == id)
-			return pUser;
+			return pUser->getLogin();
 	}
-	return nullptr;
 }
 
 int searchIDbyLogin(std::vector<User*>& vpU, const std::string& login)
@@ -138,10 +137,10 @@ int main()
 				int it_to = msg->getTo();
 				if (it_to == entered->getID() || it_to == toALL)
 				{
-					std::cout << "Сообщение от: " << searchUserByID(vpUsers, msg->getFrom())->getLogin()
+					std::cout << "Сообщение от: " << searchLoginByID(vpUsers, msg->getFrom())
 						<< ": " << msg;
 					int choice;
-					std::cout << "Выберете: 1 - ответить, 2 - написать другому пользователю, 3 - выйти из чата."
+					std::cout << "Выберете: 1 - ответить, 2 - написать другому пользователю, 3 - выйти из чата, "
 						<< "4 - выйти из программы.";
 					std::cin >> choice;
 
