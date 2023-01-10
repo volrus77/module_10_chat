@@ -6,8 +6,8 @@ Message::Message(const std::string& text, int to, int from)
 {}
 
 // перегруженный оператор<<
-std::ostream& operator<<(std::ostream& out, const Message* msg)
+std::ostream& operator<<(std::ostream& out, const Message& msg)
 {
-	out << msg->text_ << std::endl;
+	out << msg.text_ << std::endl;
 	return out;
 }
