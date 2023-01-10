@@ -10,7 +10,7 @@ const int toALL = 1;  // когда надо отправить всем, пиш
 const int tModerator = 2;  // адрес модератора
 
 // функция регистрации пользователя, пользователь сохраняется в векторе
-bool registration(std::vector<User*>& v)
+bool registration(std::vector<User>& v)
 {
 	std::string login;
 	std::string password;
@@ -22,14 +22,14 @@ bool registration(std::vector<User*>& v)
 	std::string name;
 	std::cin >> name;
 
-	User* us = new User(login, password, name);
+	User us = User(login, password, name);
 	v.push_back(us);
 	std::cout << login << " Вы зарегистрированы." << std::endl;
 	return true;
 }
 
 // функция входа в чат
- User* enterInChat(std::vector<User*>& v)
+ const User& enterInChat( std::vector<User>& v)
 {
 	std::string login;
 	std::string password;
@@ -41,37 +41,38 @@ bool registration(std::vector<User*>& v)
 	std::cout << "Login: " << login << "\tPassword: " << password << std::endl;
 	for (auto& user : v)
 	{
-		if (user->getLogin() == login && user->getPassword() == password)
+		if (user.getLogin() == login && user.getPassword() == password)
 		{
-			user->setActivNow();
-			std::cout << "Здравствуйте " << user->getLogin() << ", Вы вошли в чат!" << std::endl;
+			user.setActivNow();
+			std::cout << "Здравствуйте " << user.getLogin() << ", Вы вошли в чат!" << std::endl;
 			return user; // возвращает указатель на пользователя, если вход успешен
 		}
 	}
-	return nullptr;  // возвращает 0, если вход неуспешен
+	//return 0;  // возвращает 0, если вход неуспешен
 }
 
-const std::string& searchLoginByID(std::vector<User*>& vpU, int id)
+const std::string& searchLoginByID(const std::vector<User>& vU, int id)
 {
-	for (const auto pUser : vpU)
+	for (const auto& User : vU)
 	{
-		if (pUser->getID() == id)
-			return pUser->getLogin();
+		if (User.getID() == id)
+			return User.getLogin();
 	}
+	return nullptr;
 }
 
-int searchIDbyLogin(std::vector<User*>& vpU, const std::string& login)
+int searchIDbyLogin(const std::vector<User>& vU, const std::string& login)
 {
-	for (const auto& pUser : vpU)
+	for (const auto& User : vU)
 	{
-		if (pUser->getLogin() == login)
-			return pUser->getID();
+		if (User.getLogin() == login)
+			return User.getID();
 	}
 	return 0;
 }
 
 // пишем сообщение, логин получателя запрашиваем с клавиатуры
-void writeMessage(std::vector<User*>& vpU, std::vector<Message*>& vpMs, int id_from)
+void writeMessage(std::vector<User>& vU, std::vector<Message>& vMs, int id_from)
 {
 	std::cin.clear();
 	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -85,12 +86,12 @@ void writeMessage(std::vector<User*>& vpU, std::vector<Message*>& vpMs, int id_f
 	std::string text;
 	std::getline(std::cin, text);
 	
-	Message* ms =  new Message(text, searchIDbyLogin(vpU, login), id_from ); // использую new без delete
-	vpMs.push_back(ms);
+	Message ms = Message(text, searchIDbyLogin(vU, login), id_from );
+	vMs.push_back(ms);
 }
 
 // пишем сообщение как ответ, т. е. когда известен получатель
-void writeMessage(std::vector<User*>& vpU, std::vector<Message*>& vpMs, int id_to, int id_from)
+void writeMessage(std::vector<User>& vU, std::vector<Message>& vMs, int id_to, int id_from)
 {
 	std::cin.clear();
 	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -99,8 +100,8 @@ void writeMessage(std::vector<User*>& vpU, std::vector<Message*>& vpMs, int id_t
 	std::string text;
 	std::getline(std::cin, text);
 
-	Message* ms =  new Message(text, id_to, id_from);  // использую new без delete
-	vpMs.push_back(ms);
+	Message ms = Message(text, id_to, id_from);  // использую new без delete
+	vMs.push_back(ms);
 }
 
 
@@ -111,27 +112,27 @@ int main()
 	User all("loginall", "passwordall", "Nameall"); // Первым создаём пользователя all, его ID = 1
 	User moderator("loginm", "passwordm", "Namem"); // Затем создаём модератора, его ID = 2
 
-	std::vector<User*> vpUsers{ &all, &moderator };   // создаём вектор для пользователей
+	std::vector<User> vUsers{ all, moderator };   // создаём вектор для пользователей
 
-	registration(vpUsers);  // регистрируем двух плользователей
-	registration(vpUsers);
+	registration(vUsers);  // регистрируем двух плользователей
+	registration(vUsers);
 
-	std::vector<Message*> vpMsg{ };  // создаём вектор для сообщений
+	std::vector<Message> vMsg{ };  // создаём вектор для сообщений
 
 	bool work = true;
 	while (work)   //  основной цикл чата
 	{
 
-		User* entered = enterInChat(vpUsers);
-		if (entered)
+		User entered = enterInChat(vUsers);
+		if (entered.getID())
 		{
 			bool processed = false;
-			for (const auto& msg : vpMsg)
+			for (const auto& msg : vMsg)
 			{
-				int it_to = msg->getTo();
-				if (it_to == entered->getID() || it_to == toALL)
+				int it_to = msg.getTo();
+				if (it_to == entered.getID() || it_to == toALL)
 				{
-					std::cout << "Сообщение от: " << searchLoginByID(vpUsers, msg->getFrom())
+					std::cout << "Сообщение от: " << searchLoginByID(vUsers, msg.getFrom())
 						<< ": " << msg;
 					int choice;
 					std::cout << "Выберете: 1 - ответить, 2 - написать другому пользователю, 3 - выйти из чата, "
@@ -140,30 +141,30 @@ int main()
 
 					if (choice == 1)
 					{
-						writeMessage(vpUsers, vpMsg, msg->getFrom(), entered->getID());
-						entered->setDeactivNow();
-						std::cout << entered->getLogin() << ", вы вышли из чата!!!" << std::endl;
+						writeMessage(vUsers, vMsg, msg.getFrom(), entered.getID());
+						entered.setDeactivNow();
+						std::cout << entered.getLogin() << ", вы вышли из чата!!!" << std::endl;
 						processed = true;
 						break;
 					}
 					if (choice == 2)
 					{
-						writeMessage(vpUsers, vpMsg, entered->getID());
-						entered->setDeactivNow();
-						std::cout << entered->getLogin() << ", вы вышли из чата!!!" << std::endl;
+						writeMessage(vUsers, vMsg, entered.getID());
+						entered.setDeactivNow();
+						std::cout << entered.getLogin() << ", вы вышли из чата!!!" << std::endl;
 						processed = true;
 						break;
 					}
 					if (choice == 3)
 					{
-						entered->setDeactivNow();
-						std::cout << entered->getLogin() << ", вы вышли из чата!!!" << std::endl;
+						entered.setDeactivNow();
+						std::cout << entered.getLogin() << ", вы вышли из чата!!!" << std::endl;
 						processed = true;
 						break;
 					}
 					if (choice == 4)
 					{
-						entered->setDeactivNow();
+						entered.setDeactivNow();
 						processed = true;
 						work = false;
 						break;
@@ -173,8 +174,8 @@ int main()
 			if (!processed)
 			{
 				std::cout << "Для вас сегодня нет сообщений." << std::endl;
-				writeMessage(vpUsers, vpMsg, entered->getID());
-				std::cout << entered->getLogin() << ", вы вышли из чата!!!" << std::endl;
+				writeMessage(vUsers, vMsg, entered.getID());
+				std::cout << entered.getLogin() << ", вы вышли из чата!!!" << std::endl;
 			}
 		}
 		else

@@ -13,14 +13,14 @@ public:
 
 	// гетттеры
 	const std::string& getText() const { return text_; }
-	int getTo() { return to_; }
-	int getFrom() { return from_; }
+	int getTo() const { return to_; }
+	int getFrom() const { return from_; }
 
 	// перегруженый оператор= ( оператор присваивания копированием)
 
 
 	// перегруженный оператор<<
-	friend std::ostream& operator<<(std::ostream& out, const Message* msg);
+	friend std::ostream& operator<<(std::ostream& out, const Message& msg);
 
 private:
 	std::string text_;  // text of message
